@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+.env/
+
+# ML models
+*.h5
+*.keras
+models/*.h5
+
+# Databases
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+
+test-images/
+auto_downloads/
+reports/
+
+.env
