@@ -16,6 +16,52 @@ from typing import Dict, List
 import sqlite3
 
 # =====================================================
+# GEMINI AI SETUP
+# =====================================================
+
+try:
+    import google.generativeai as genai
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+    if GEMINI_API_KEY:
+        genai.configure(api_key=GEMINI_API_KEY)
+        GEMINI_ENABLED = True
+    else:
+        GEMINI_ENABLED = False
+        print("⚠️  GEMINI_API_KEY not set. AI reasoning will use fallback text.")
+except ImportError:
+    GEMINI_ENABLED = False
+    print("⚠️  google-generativeai not installed. Run: pip install google-generativeai==0.3.0")
+
+def generate_ai_reasoning(confidence: float, area_hectares: float, mining_type: str = "Illegal Open-cast Mining") -> str:
+    """
+    Uses Gemini API to generate environmental impact assessment.
+    Falls back to a template string if API key not set.
+    """
+    if not GEMINI_ENABLED:
+        # Fallback if no API key
+        return (
+            f"Illegal mining detected with {confidence:.0f}% confidence over {area_hectares} hectares. "
+            f"Type: {mining_type}. Immediate field verification and stop-work notice recommended. "
+            f"Significant soil erosion, water contamination, and biodiversity loss likely. "
+            f"Deploy enforcement team within 24 hours."
+        )
+    
+    try:
+        model = genai.GenerativeModel('gemini-pro')
+        prompt = f"""
+Illegal mining detected with {confidence:.0f}% confidence.
+Mining type: {mining_type}
+Area affected: {area_hectares} hectares
+
+Generate a brief environmental impact assessment and recommended actions.
+Keep it under 100 words. Be specific and actionable.
+"""
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        return f"AI reasoning unavailable ({str(e)[:60]}). Manual assessment required."
+
+# =====================================================
 # MANUAL WORKFLOW HANDLER
 # =====================================================
 
@@ -183,6 +229,13 @@ class ManualWorkflowHandler:
         area_name_clean = scan_info['area_name'].replace(' ', '_').replace('/', '_')
         report_filename = f"Mining_Report_{area_name_clean}_{timestamp}.txt"
         
+        # 🤖 Generate AI reasoning via Gemini
+        ai_reasoning = generate_ai_reasoning(
+            confidence=detection_result['confidence'],
+            area_hectares=detection_result['area_hectares'],
+            mining_type=detection_result.get('severity', 'Illegal') + " Mining"
+        )
+        
         # Generate report content
         report_content = f"""
 {"="*70}
@@ -229,6 +282,11 @@ Area Affected: {detection_result['area_hectares']} hectares
 Trees Destroyed: {detection_result['trees_destroyed']}+ (estimated)
 Soil Erosion: High risk
 Water Contamination: Likely
+
+SECTION 4A: AI-GENERATED IMPACT ASSESSMENT (Powered by Gemini)
+{"="*70}
+
+{ai_reasoning}
 
 {"="*70}
 SECTION 5: ECONOMIC IMPACT

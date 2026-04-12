@@ -35,6 +35,36 @@ from dotenv import load_dotenv
 # Load .env file (for local testing)
 load_dotenv()
 
+# =====================================================
+# GEMINI AI SETUP
+# =====================================================
+
+try:
+    import google.generativeai as genai
+    _gemini_key = os.getenv("GEMINI_API_KEY")
+    if _gemini_key:
+        genai.configure(api_key=_gemini_key)
+        GEMINI_ENABLED = True
+        print("✅ Gemini AI enabled")
+    else:
+        GEMINI_ENABLED = False
+        print("⚠️  GEMINI_API_KEY not set — using hardcoded text fallbacks")
+except ImportError:
+    GEMINI_ENABLED = False
+    print("⚠️  google-generativeai not installed — using hardcoded text fallbacks")
+
+def _gemini_generate(prompt: str, fallback: str) -> str:
+    """Helper: call Gemini, return fallback on any error"""
+    if not GEMINI_ENABLED:
+        return fallback
+    try:
+        model_g = genai.GenerativeModel('gemini-pro')
+        response = model_g.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        print(f"⚠️  Gemini error: {e}")
+        return fallback
+
 
 
 
@@ -289,33 +319,48 @@ def estimate_financial_loss(area_hectares: float, mining_type: str = "Unknown") 
     return int(area_hectares * rate * np.random.uniform(0.9, 1.3))
 
 def generate_reasoning(confidence: float, severity: str) -> str:
-    """Generate AI reasoning text"""
-    if confidence > 80:
-        return f"High confidence detection ({confidence:.1f}%). Clear indicators of mining activity including soil disruption, machinery presence, and altered terrain patterns. {severity} severity level assigned based on extent of environmental impact."
-    elif confidence > 60:
-        return f"Moderate confidence detection ({confidence:.1f}%). Multiple indicators suggest mining activity including terrain changes and potential machinery. Further verification recommended."
-    else:
-        return f"Low confidence detection ({confidence:.1f}%). Some indicators present but additional verification required. May be natural terrain features or legal activity."
+    """Generate AI reasoning text using Gemini"""
+    fallback = (
+        f"Detection confidence: {confidence:.1f}%. Severity: {severity}. "
+        f"Satellite imagery shows indicators of illegal mining activity. "
+        f"Field verification recommended."
+    )
+    prompt = (
+        f"An AI system detected illegal mining with {confidence:.1f}% confidence. "
+        f"Severity level: {severity}. "
+        f"Write a 2-sentence technical reasoning explaining what satellite indicators "
+        f"likely triggered this detection. Be specific and professional. Under 60 words."
+    )
+    return _gemini_generate(prompt, fallback)
 
 def generate_environmental_impact(area_hectares: float, severity: str) -> str:
-    """Generate environmental impact assessment"""
-    trees_destroyed = int(area_hectares * 200)  # ~200 trees per hectare
-    
-    if severity == "Critical":
-        return f"Severe environmental damage observed. Approximately {area_hectares:.1f} hectares affected with an estimated {trees_destroyed}+ trees destroyed. High risk of soil erosion, water contamination, and habitat loss. Immediate intervention required to prevent further degradation."
-    elif severity == "High":
-        return f"Significant environmental impact detected. Area of {area_hectares:.1f} hectares shows signs of disruption with approximately {trees_destroyed} trees at risk. Potential for water table contamination and ecosystem damage. Prompt action recommended."
-    else:
-        return f"Moderate environmental concerns identified across {area_hectares:.1f} hectares. Estimated {trees_destroyed} trees affected. Monitoring and assessment needed to prevent escalation of damage."
+    """Generate environmental impact assessment using Gemini"""
+    trees_destroyed = int(area_hectares * 200)
+    fallback = (
+        f"Approximately {area_hectares:.1f} hectares affected with ~{trees_destroyed} trees destroyed. "
+        f"Severity: {severity}. High risk of soil erosion and water contamination. Immediate intervention required."
+    )
+    prompt = (
+        f"Illegal mining detected over {area_hectares:.1f} hectares (severity: {severity}). "
+        f"Estimated {trees_destroyed} trees destroyed. "
+        f"Write a concise 2-sentence environmental impact assessment covering soil, water, and biodiversity risks. "
+        f"Under 70 words. Be factual and urgent."
+    )
+    return _gemini_generate(prompt, fallback)
 
 def generate_legal_context(severity: str) -> str:
-    """Generate legal context and implications"""
-    if severity == "Critical":
-        return "This activity likely violates multiple environmental protection laws including the Mines and Minerals (Development and Regulation) Act, 1957, and Environment Protection Act, 1986. Immediate legal action and site inspection required. Penalties may include imprisonment up to 5 years and fines up to ₹50 lakhs."
-    elif severity == "High":
-        return "Potential violations of mining regulations detected. Investigation required under relevant mining and environmental laws. Site may be operating without proper permits or exceeding authorized mining limits."
-    else:
-        return "Activity warrants investigation for potential regulatory violations. Verification of mining permits and environmental clearances recommended."
+    """Generate legal context and implications using Gemini"""
+    fallback = (
+        "Potential violations of the Mines and Minerals (Development and Regulation) Act, 1957, "
+        "and Environment Protection Act, 1986 detected. "
+        "Immediate legal investigation and field inspection required."
+    )
+    prompt = (
+        f"Illegal mining detected with severity level: {severity}. "
+        f"Write a 2-sentence legal context referencing relevant Indian laws (MMDR Act 1957, EPA 1986, Forest Conservation Act 1980). "
+        f"Mention applicable penalties. Under 70 words. Professional tone."
+    )
+    return _gemini_generate(prompt, fallback)
 
 # =====================================================
 # API ENDPOINTS
