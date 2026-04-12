@@ -223,6 +223,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ModeToggle } from '@/components/mode-toggle';
 
 const navItems = [
   { title: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -349,6 +350,7 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-2">
+            <ModeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">

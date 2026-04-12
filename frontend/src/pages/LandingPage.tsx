@@ -7,6 +7,13 @@ import {
   Globe, Zap, Eye, FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ModeToggle } from '@/components/mode-toggle';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 /* ─── Animated counter ─── */
 function Counter({ target, suffix = '', duration = 2 }: { target: number; suffix?: string; duration?: number }) {
@@ -93,6 +100,31 @@ function ParticleField() {
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 
+/* ─── Radar Animation ─── */
+function RadarAnimation() {
+  return (
+    <div className="relative w-[300px] h-[300px] md:w-[450px] md:h-[450px] shrink-0 aspect-square border border-primary/40 rounded-full flex items-center justify-center overflow-hidden bg-primary/5 shadow-[0_0_40px_rgba(16,185,129,0.15)] mx-auto my-12">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(16,185,129,0.05)_100%)]"></div>
+      <div className="absolute w-full h-full border border-primary/20 rounded-full"></div>
+      <div className="absolute w-3/4 h-3/4 border border-primary/20 rounded-full"></div>
+      <div className="absolute w-1/2 h-1/2 border border-primary/20 rounded-full"></div>
+      <div className="absolute w-1/4 h-1/4 border border-primary/20 rounded-full"></div>
+      <div className="absolute w-full h-px bg-primary/20"></div>
+      <div className="absolute h-full w-px bg-primary/20"></div>
+      
+      <motion.div
+        className="absolute w-[50%] h-[50%] bg-gradient-to-br from-primary/30 to-transparent origin-bottom-right"
+        style={{ right: '50%', bottom: '50%' }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+      />
+      <motion.div className="absolute w-2.5 h-2.5 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)] top-1/4 left-1/3" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, times: [0, 0.1, 1], delay: 1 }} />
+      <motion.div className="absolute w-3.5 h-3.5 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)] bottom-1/3 right-1/4" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, times: [0, 0.1, 1], delay: 2.5 }} />
+      <motion.div className="absolute w-2 h-2 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)] top-[40%] right-[30%]" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, times: [0, 0.1, 1], delay: 0.5 }} />
+    </div>
+  );
+}
+
 /* ─── Grid overlay ─── */
 function ScanGrid() {
   return (
@@ -156,9 +188,12 @@ export default function LandingPage() {
             <a href="#stats" className="hover:text-foreground transition-colors">Technology</a>
             <a href="#cta" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
-          <Button size="sm" className="hidden sm:flex gap-2 shadow-lg shadow-primary/20" onClick={() => navigate('/dashboard')}>
-            Launch Dashboard <ArrowRight className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button size="sm" className="hidden sm:flex gap-2 shadow-lg shadow-primary/20" onClick={() => navigate('/dashboard')}>
+              Launch Dashboard <ArrowRight className="w-4 h-4" />
+            </Button>
+            <ModeToggle />
+          </div>
         </div>
       </motion.header>
 
@@ -177,15 +212,15 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6"
+            className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-tight lg:leading-[1.15] mb-8"
             initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.7 }}
           >
             Detecting Illegal Mining{' '}
-            <span className="bg-gradient-to-r from-cyan to-primary bg-clip-text text-transparent">from Space</span>
+            <span className="bg-gradient-to-r from-cyan to-primary bg-clip-text text-transparent block sm:inline mt-2 sm:mt-0">from Space</span>
           </motion.h1>
 
           <motion.p
-            className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
+            className="text-lg sm:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed"
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.6 }}
           >
             SATGUARD combines cutting-edge artificial intelligence with real-time satellite imagery to detect, monitor, and prevent illegal mining activities before irreversible damage occurs.
@@ -230,7 +265,7 @@ export default function LandingPage() {
       </motion.section>
 
       {/* ── FEATURES ── */}
-      <section id="features" className="relative py-32 px-6" ref={featRef}>
+      <section id="features" className="relative py-20 px-6" ref={featRef}>
         <div className="max-w-7xl mx-auto">
           <motion.div className="text-center mb-16" variants={stagger} initial="hidden" animate={featInView ? 'visible' : 'hidden'}>
             <motion.p variants={fadeUp} className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">How It Works</motion.p>
@@ -256,7 +291,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS STEPS ── */}
-      <section id="stats" className="py-32 px-6 relative">
+      <section id="stats" className="py-20 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background pointer-events-none" />
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -290,8 +325,81 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── RADAR ANIMATION SECTION ── */}
+      <section className="py-16 px-6 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Live Threat Monitoring</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
+            Our AI continuously scans broad regions, isolating anomalous topography and newly formed structures associated with illegal extraction points.
+          </p>
+          <RadarAnimation />
+        </div>
+      </section>
+
+      {/* ── USER INSTRUCTIONS ── */}
+      <section className="py-20 px-6 bg-secondary/5 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold">How to Use SatGuard</h2>
+            <p className="text-muted-foreground mt-4">Simple steps to start monitoring potential illegal mining activities</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="glass-card p-8 flex flex-col items-center text-center transition-all hover:scale-105 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5">
+              <div className="w-12 h-12 rounded-full border-2 border-primary text-primary flex items-center justify-center font-bold text-xl mb-6 shadow-[0_0_15px_rgba(16,185,129,0.3)]">1</div>
+              <h3 className="text-xl font-bold mb-3">Sign Up & Login</h3>
+              <p className="text-muted-foreground text-sm">Securely log into the dashboard using your agency credentials to access monitoring tools.</p>
+            </div>
+            <div className="glass-card p-8 flex flex-col items-center text-center border-primary/30 relative transition-all hover:scale-105 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5">
+              <div className="hidden md:block absolute -left-4 top-[4.5rem] w-8 h-px bg-primary/40"></div>
+              <div className="w-12 h-12 rounded-full border-2 border-primary text-primary bg-primary/10 flex items-center justify-center font-bold text-xl mb-6 shadow-[0_0_20px_rgba(16,185,129,0.5)]">2</div>
+              <h3 className="text-xl font-bold mb-3">Upload or Monitor</h3>
+              <p className="text-muted-foreground text-sm">Drag and drop drone imagery or select real-time satellite data for constant high-risk zone scanning.</p>
+              <div className="hidden md:block absolute -right-4 top-[4.5rem] w-8 h-px bg-primary/40"></div>
+            </div>
+            <div className="glass-card p-8 flex flex-col items-center text-center transition-all hover:scale-105 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5">
+              <div className="w-12 h-12 rounded-full border-2 border-primary text-primary flex items-center justify-center font-bold text-xl mb-6 shadow-[0_0_15px_rgba(16,185,129,0.3)]">3</div>
+              <h3 className="text-xl font-bold mb-3">Review & Act</h3>
+              <p className="text-muted-foreground text-sm">Investigate AI-flagged alerts, confirm detected disturbances, and export legal reports.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQs ── */}
+      <section className="py-24 px-6 max-w-4xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold">Frequently Asked Questions</h2>
+        </div>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="item-1">
+            <AccordionTrigger className="text-left font-medium text-lg">How accurately does the AI detect illegal mining?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2 p-2">
+              Our models utilize a multi-layered convolutional neural network mapping changes in NDVI (vegetation loss) and terrain disturbances, performing with a verified 94% accuracy rate that decisively outperforms manual auditing.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2">
+            <AccordionTrigger className="text-left font-medium text-lg">How frequently is the satellite imagery updated?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2 p-2">
+              By utilizing the Sentinel-2 and Landsat constellations, we receive actionable imagery approximately every 5-7 days, which provides an ideal cadence for spotting early-stage extractive footprints.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3">
+            <AccordionTrigger className="text-left font-medium text-lg">Are the generated reports compliant with legal bodies?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2 p-2">
+              Yes! All system reports include unadulterated source imagery, timestamp cryptographic hashing, and exact coordinate bounds specifically formatted to be admissible for environmental regulatory filings.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-4">
+            <AccordionTrigger className="text-left font-medium text-lg">Can I analyze my own local drone surveys here?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2 p-2">
+              Absolutely. In the dashboard's "Upload Detection" section, users can deposit high-resolution orthomosaics which are routed through the same AI classification models for extreme high-fidelity results.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </section>
+
       {/* ── CTA ── */}
-      <section id="cta" className="relative py-32 px-6 overflow-hidden">
+      <section id="cta" className="relative py-24 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-background to-cyan/10 pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
         <motion.div
@@ -344,7 +452,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground">
-          <p>© 2024 SATGUARD. All rights reserved.</p>
+          <p>© 2026 SATGUARD. All rights reserved.</p>
           <p>Powered by AI & Satellite Technology</p>
         </div>
       </footer>
