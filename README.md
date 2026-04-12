@@ -15,7 +15,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React Native](https://img.shields.io/badge/React%20Native-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactnative.dev)
 [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
-[![Sentinel-2](https://img.shields.io/badge/Sentinel--2%20SAR-1a73e8?style=flat-square&logo=googleearth&logoColor=white)](https://sentinel.esa.int)
+[![Sentinel-1 SAR](https://img.shields.io/badge/Sentinel_1_SAR-1a73e8?style=flat-square&logo=googleearth&logoColor=white)](https://sentinel.esa.int)
  
 <br/>
  
@@ -24,7 +24,16 @@
 </div>
  
 ---
+ ## 🚀 Live Demo
  
+| | Link |
+|---|---|
+| 🌐 **Frontend** | [https://sat-guard.vercel.app](https://sat-guard.vercel.app) |
+| 🟢 **API (Swagger Docs)** | [https://illegal-mining-api.onrender.com/api/docs](https://illegal-mining-api.onrender.com/api/docs) |
+ 
+> ⚠️ **Note:** Backend is hosted on **Render Free Tier** — it may take **30–60 seconds to wake up** on first load. Please wait and refresh if it shows an error.
+ 
+---
 ## 📌 Overview
  
 **SatGuard** is an intelligent monitoring platform that uses **Sentinel-2 SAR satellite imagery** and **AI-based analysis** to detect unauthorized and illegal mining activities across large geographical areas.
@@ -55,7 +64,8 @@ It empowers environmental agencies and law enforcement to:
 ## 🛠️ Tech Stack
  
 ### Frontend
-![React Native](https://img.shields.io/badge/React%20Native-Expo-61DAFB?style=flat-square&logo=react)
+![React Native](https://img.shields.io/badge/React%20Native-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
  
 ### Backend
@@ -71,7 +81,7 @@ It empowers environmental agencies and law enforcement to:
 ![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=flat-square&logo=jupyter&logoColor=white)
  
 ### Satellite Data
-![Sentinel-2](https://img.shields.io/badge/Sentinel--2%20SAR-1a73e8?style=flat-square&logo=googleearth&logoColor=white)
+[![Sentinel-1 SAR](https://img.shields.io/badge/Sentinel_1_SAR-1a73e8?style=flat-square&logo=googleearth&logoColor=white)](https://sentinel.esa.int)
  
 ---
   
