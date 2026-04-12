@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Satellite, Brain, Bell, Shield, ChevronDown, Play,
   ArrowRight, Mail, Phone, MapPin, Github, Linkedin, Twitter,
-  Globe, Zap, Eye, FileText
+  Globe, Zap, Eye, FileText, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/mode-toggle';
@@ -14,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import demoVideo from "@/assets/demo.mp4";
 
 /* ─── Animated counter ─── */
 function Counter({ target, suffix = '', duration = 2 }: { target: number; suffix?: string; duration?: number }) {
@@ -75,7 +76,6 @@ function ParticleField() {
         ctx.fillStyle = `rgba(16,185,129,${p.o})`;
         ctx.fill();
       });
-      // draw connections
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -111,7 +111,6 @@ function RadarAnimation() {
       <div className="absolute w-1/4 h-1/4 border border-primary/20 rounded-full"></div>
       <div className="absolute w-full h-px bg-primary/20"></div>
       <div className="absolute h-full w-px bg-primary/20"></div>
-      
       <motion.div
         className="absolute w-[50%] h-[50%] bg-gradient-to-br from-primary/30 to-transparent origin-bottom-right"
         style={{ right: '50%', bottom: '50%' }}
@@ -144,7 +143,88 @@ function ScanGrid() {
   );
 }
 
-/* ─── Feature card ─── */
+/* ─── Demo Video Modal ─── */
+function DemoModal({ onClose }: { onClose: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleKey);
+    // Prevent background scroll
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal box */}
+      <motion.div
+        className="relative z-10 w-full max-w-4xl rounded-2xl overflow-hidden border border-primary/30 shadow-2xl shadow-primary/10"
+        initial={{ scale: 0.92, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.92, opacity: 0, y: 20 }}
+        transition={{ duration: 0.3, ease: [0.34, 1.1, 0.64, 1] }}
+      >
+        {/* Header bar */}
+        <div className="flex items-center justify-between px-5 py-3 bg-card border-b border-border/50">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-xs font-mono text-muted-foreground tracking-widest">
+              SATGUARD // DEMO WALKTHROUGH
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-destructive/20 hover:text-destructive border border-border/50 transition-all duration-200"
+            aria-label="Close video"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Video */}
+        <div className="bg-black">
+          <video
+            ref={videoRef}
+            src={demoVideo}
+            controls
+            autoPlay
+            className="w-full max-h-[70vh] outline-none"
+            style={{ display: 'block' }}
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        {/* Footer bar */}
+        <div className="flex items-center justify-between px-5 py-3 bg-card border-t border-border/50">
+          <p className="text-xs text-muted-foreground">
+            Press <kbd className="px-1.5 py-0.5 rounded border border-border text-xs bg-secondary">Esc</kbd> or click outside to close
+          </p>
+          <p className="text-xs text-muted-foreground font-mono">AI-Powered Illegal Mining Detection</p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ─── Feature cards ─── */
 const features = [
   { icon: Satellite, title: 'Real-Time Satellite Data', desc: 'Continuous monitoring using Sentinel-2 satellite imagery with 10m resolution covering vast terrain.', color: 'text-cyan' },
   { icon: Brain, title: 'Advanced AI Analysis', desc: 'Deep learning models trained on 10,000+ images detect mining activity with 94% accuracy.', color: 'text-primary' },
@@ -152,7 +232,7 @@ const features = [
   { icon: Shield, title: 'Automated Reporting', desc: 'Generate court-ready reports with GPS evidence, satellite imagery, and AI analysis.', color: 'text-cyan' },
 ];
 
-/* ─── Stats for hero ─── */
+/* ─── Stats ─── */
 const heroStats = [
   { value: 1247, suffix: '+', label: 'Detections' },
   { value: 89, suffix: '', label: 'Critical Alerts' },
@@ -165,6 +245,10 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 
 export default function LandingPage() {
   const navigate = useNavigate();
+
+  // ── Demo modal state ──
+  const [showDemo, setShowDemo] = useState(false);
+
   const featRef = useRef(null);
   const featInView = useInView(featRef, { once: true, margin: '-80px' });
   const { scrollYProgress } = useScroll();
@@ -173,6 +257,10 @@ export default function LandingPage() {
 
   return (
     <div className="bg-background text-foreground overflow-x-hidden">
+
+      {/* ── DEMO VIDEO MODAL ── */}
+      {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
+
       {/* ── NAV ── */}
       <motion.header
         className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/60 border-b border-border/40"
@@ -201,7 +289,6 @@ export default function LandingPage() {
       <motion.section style={{ opacity: heroOpacity, scale: heroScale }} className="relative min-h-screen flex items-center justify-center pt-16">
         <ParticleField />
         <ScanGrid />
-        {/* radial glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
@@ -233,7 +320,14 @@ export default function LandingPage() {
             <Button size="lg" className="text-base px-8 shadow-xl shadow-primary/25 animate-pulse-glow" onClick={() => navigate('/dashboard')}>
               Launch Dashboard <ArrowRight className="w-5 h-5 ml-1" />
             </Button>
-            <Button size="lg" variant="outline" className="text-base px-8 gap-2 border-border/60">
+
+            {/* ── WATCH DEMO BUTTON — opens video modal ── */}
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base px-8 gap-2 border-border/60 hover:border-primary/50 hover:text-primary transition-all duration-200"
+              onClick={() => setShowDemo(true)}
+            >
               <Play className="w-4 h-4" /> Watch Demo
             </Button>
           </motion.div>
@@ -254,7 +348,6 @@ export default function LandingPage() {
           </motion.div>
         </div>
 
-        {/* scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground"
           animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}
@@ -325,7 +418,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── RADAR ANIMATION SECTION ── */}
+      {/* ── RADAR ANIMATION ── */}
       <section className="py-16 px-6 relative overflow-hidden">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Live Threat Monitoring</h2>
