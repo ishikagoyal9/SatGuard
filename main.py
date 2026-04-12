@@ -845,7 +845,7 @@ async def mark_notification_read(notification_id: int):
 @app.post("/api/notifications/mark-all-read", tags=["Advanced Features"])
 async def mark_all_notifications_read():
     """
-    ✅ Mark ALL Notifications as Read
+        Mark ALL Notifications as Read
     
     Officer clicks "Mark all as read"
     """
@@ -915,7 +915,7 @@ async def trigger_manual_scan(
     area_name: str = Query(...)
 ):
     """
-    👮 Trigger Manual Inspection Workflow
+        Trigger Manual Inspection Workflow
     
     Steps (as per your screenshots):
     1. Officer selects area on map
@@ -1004,9 +1004,8 @@ async def compare_site_with_previous(site_id: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-# =====================================================
-# RUN SERVER
-# =====================================================
+    
+
 
 if __name__ == "__main__":
     import uvicorn
